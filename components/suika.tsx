@@ -25,6 +25,7 @@ const Suika = () => {
       canvas: canvasRef.current as HTMLCanvasElement,
       engine: engine,
       options: {
+        wireframes: false,
         width: window.innerWidth,
         height: window.innerHeight,
       },
@@ -38,35 +39,52 @@ const Suika = () => {
     const world = engine.world;
 
     // 게임 벽 객체 생성
-    const wallLeft = Bodies.rectangle(0, 0, 6, window.innerHeight * 2, {
+    const wallLeft = Bodies.rectangle(0, 0, 10, window.innerHeight * 2, {
       isStatic: true,
       label: "wallLeft",
+      render: {
+        fillStyle: "#00ffff",
+      },
+      isSleeping: true,
     });
     const wallRight = Bodies.rectangle(
-      window.innerWidth * 2 - 30,
+      window.innerWidth,
       0,
-      666,
+      10,
       window.innerHeight * 2,
-      { isStatic: true, label: "wallRight" },
+      {
+        isStatic: true,
+        label: "wallRight",
+        render: {
+          fillStyle: "#00ffff",
+        },
+        isSleeping: true,
+      },
     );
     const wallBottom = Bodies.rectangle(
       0,
       window.innerHeight,
       window.innerWidth * 2,
       50,
-      { isStatic: true, label: "wallBottom" },
+      {
+        isStatic: true,
+        label: "wallBottom",
+        render: {
+          fillStyle: "#00ffff",
+        },
+        isSleeping: true,
+      },
     );
 
     const addWatermelon = (x: number, y: number) => {
-      const watermelon = Bodies.circle(x, y, 10, {
+      const watermelon = Bodies.circle(x, y, 20, {
         restitution: 0.1,
         label: "watermelon" + watermelons.length,
         render: {
           sprite: {
-            texture:
-              "https://velog.velcdn.com/images%2Fseungjae2668%2Fpost%2Fedfd8b55-7cde-42f6-9d9d-0ed50fd1a3e3%2Fimage.png",
-            xScale: 0.5,
-            yScale: 0.5,
+            texture: "./suika.webp",
+            xScale: (20 * 2) / 100,
+            yScale: (20 * 2) / 100,
           },
         },
       });
@@ -100,10 +118,9 @@ const Suika = () => {
           label: "lemon" + lemons.length,
           render: {
             sprite: {
-              texture:
-                "https://velog.velcdn.com/images%2Fseungjae2668%2Fpost%2Fedfd8b55-7cde-42f6-9d9d-0ed50fd1a3e3%2Fimage.png",
-              xScale: 0.5,
-              yScale: 0.5,
+              texture: "./lemon.png",
+              xScale: (25 * 2) / 100,
+              yScale: (25 * 2) / 100,
             },
           },
         });
@@ -131,16 +148,28 @@ const Suika = () => {
         const centerX = (positionA.x + positionB.x) / 2;
         const centerY = (positionA.y + positionB.y) / 2;
 
-        // 중간 지점에 레몬을 생성합니다.
-        const podo = Bodies.circle(centerX, centerY, 60, {
+        const grapeRadius = 60;
+        const grapeImageSize = 100;
+        const grapeVertices = [
+          { x: 60, y: 0 },
+          { x: 115, y: 22 },
+          { x: 112, y: 45 },
+          { x: 98, y: 67 },
+          { x: 93, y: 108 },
+          { x: 2, y: 119 },
+          { x: 13, y: 34 },
+          { x: 53, y: 22 },
+          { x: 58, y: 2 },
+        ];
+        // 중간 지점에 포도를 생성합니다.
+        const podo = Bodies.fromVertices(centerX, centerY, [grapeVertices], {
           restitution: 0.6,
           label: "podo" + podos.length,
           render: {
             sprite: {
-              texture:
-                "https://velog.velcdn.com/images%2Fseungjae2668%2Fpost%2Fedfd8b55-7cde-42f6-9d9d-0ed50fd1a3e3%2Fimage.png",
-              xScale: 0.5,
-              yScale: 0.5,
+              texture: "grape.png",
+              xScale: (grapeRadius * 2) / grapeImageSize,
+              yScale: (grapeRadius * 2) / grapeImageSize,
             },
           },
         });
@@ -160,7 +189,6 @@ const Suika = () => {
       const collidingWatermelons: Matter.Body[] = [];
       const collidingLemons: Matter.Body[] = [];
       event.pairs.forEach((pair) => {
-        console.log(pair.bodyA.label, pair.bodyB.label);
         if (
           watermelons.includes(pair.bodyA) &&
           watermelons.includes(pair.bodyB)
